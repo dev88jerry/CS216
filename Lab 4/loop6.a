@@ -30,15 +30,17 @@ __start:		# execution starts here  */
 
 	la $t0, numbers 	# $t0 points to elements
 	li $t1, 1000		# value less than 1000
+	li $t8, 0		# set counter = 0
 	li $t9, 0		# set sum = 0
 	
 loop:	
 	lw $t2, ($t0)		# load next word from array
-	beqz $t2, strEnd
+	beq $t8, 5, strEnd	# when counter == 5 -> stop loop
 	bgt $t2, $t1, jump	# if val > 100 -> jump
 	add $t9, $t9, $t2 	# sum = sum + number < 1000
 jump:
 	add $t0, $t0, 4		# increment pointer by word
+	add $t8, $t8, 1		# increment counter by 1
 	j loop
 
 strEnd:
