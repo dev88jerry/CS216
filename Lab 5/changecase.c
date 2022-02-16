@@ -27,10 +27,23 @@ void sentenceCase(char* s)
 {
 	/* YOUR CODE GOES HERE */
 	
-	s[0] = s[0] & ~32;
-		
-	for(int i=1; s[i] !='\n'; i++)
-		s[i] = s[i] | 32;
+	if(s[0] == ' '){
+        int index = 0;
+        for(int i=1;s[i] !='\n'; i++){
+            s[i-1] = s[i];
+            
+            index = i;
+        }
+        
+        s[index] = '\n';
+        s[index+1] = 127;
+    }
+
+    for(int i=0; s[i] !='\n'; i++){
+        s[0] = s[0] & ~32;
+		if((s[i] >= 65 && s[i] <= 90) || (s[i] > 97 && s[i] < 122))
+			s[i] = s[i] | 32;
+	}
 	
 }
 
