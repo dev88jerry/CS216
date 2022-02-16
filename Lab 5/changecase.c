@@ -35,9 +35,6 @@ char anotherteststr[] = "aFtEr 1999 cAmE 2000 [Square Brackets]\n";
 
 #/*  Student's Name:		Account:		*/
 
-
-/*  Student's Name:	Jerry Lau	Account: jlau	*/
-
 void sentenceCase(char* s)
 {
 	/* YOUR CODE GOES HERE */
