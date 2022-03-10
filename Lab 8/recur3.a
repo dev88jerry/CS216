@@ -40,7 +40,7 @@
 ## "apple, apricot, orange, peach, pear, pineapple 42"
 ## 
 #/*# Output format must be:		*/
-#/*# "peach, avocado, apricot, apple, cantaloupe, orange, pineapple, pear, star, 407"		*/
+#/*# "peach, avocado, apricot, cantaloupe, banana, orange, 109"		*/
 #include <stdio.h>       /* for printf in C programs */
 #include <stdlib.h>	 /* for exit() in C programs */
 
@@ -55,7 +55,11 @@
        	.globl __start 
 __start:		# execution starts here  */
 
-        la $a0,tree
+	li $t0,42	#you never know what may be in registers
+	li $t1,55
+	li $s0,-666
+# calling your function--
+        la $a0,bush
         jal traverse	# Traverse the tree  <<===== YOU
 			# Should have printed names in alphabet order
         move  $a0,$v0
@@ -86,10 +90,49 @@ print_name:
 # mipsmark. Put your answer between dashed lines. */
 #/*-------------- start cut ----------------------- */
 
+#/*  Student's Name:		Account:		*/
+
+
 #  Student's Name:              Account: 
 
 
+traverse:	#  $a0 is the address of a (node of) a tree
+	bnez	$a0, exists
+	jr $ra			#tree is empty, do nothing
+exists:
+	sub	$sp, $sp, 4
+	sw	$ra, ($sp)	#save registers
+	sub	$sp, $sp, 4		#will use $s0 for pointer to our tree
+	sw	$s0, ($sp)	#since it must be remembered across function calls
+	move	$s0, $a0	# s0 points to current node
+
+# tree traverse right to left using example
+# sums all of the value of each node
+
+	lw	$a0, 8($s0)	# tree-> right
+	jal	traverse
+
+	lw	$a0,  ($s0)	# tree -> name
+	jal	print_name
+
+	lw 	$a0 , 12($s0)	# add value of node
+	move $t1, $a0
+    	add $s1, $s1, $a0
+	
+	lw	$a0, 4($s0)	# tree-> left
+	jal	traverse
+
+	lw	$s0, ($sp)	#restore registers
+	add	$sp, $sp, 4
+	lw	$ra, ($sp)
+	add	$sp, $sp, 4
+	
+	move 	$v0, $s1	# move sum to v0
+	jr	$ra
+
 	j __start	#nasty loop if mips program not exited 
+#/*
+	j __start	#nasty loop if mips program not exited */
 #/*--------------  end cut  -----------------------
 # Any changes below this line will be discarded by
 # mipsmark. Put your answer between dashed lines.
@@ -109,15 +152,15 @@ print_name:
 
 path:   .space 40
 
-tree:   .word name5, node1, node2, 10
+bush:   .word name5, node1, node2, 10
 node1:  .word name11, node3, node4, 15
-node2:  .word name7, node5, node6, 8
-node3:  .word name17, node7, 0, 30
-node4:  .word name15, 0, node9, 20
+node2:  .word name7, node5, node6, 0	#dead branch!
+node3:  .word name17, 0, 0, 30
+node4:  .word name15, node8, node9, 20
 node5:  .word name3, 0, 0, 40
 node6:  .word name12, 0, 0, 50
 node7:  .word name0, 0, 0, 230
-node8:  .word name2, 0, 0, 30  # not used
+node8:  .word name2, 0, 0, 30 
 node9:  .word name1, 0, 0, 4
 # these nodes not used
 node10: .word name4, 0, 0, 70
@@ -131,7 +174,7 @@ node17: .word name6, 0, 0, 35
 
 name0:  .asciiz "apple"
 name1:  .asciiz "orange"
-name2:  .asciiz "bananna"
+name2:  .asciiz "banana"
 name3:  .asciiz "pear"
 name4:  .asciiz "plum"
 name5:  .asciiz "peach"
@@ -152,6 +195,9 @@ endl:   .asciiz "\n"
 arrow:  .asciiz ", "
 notfound: .asciiz " not found\n"
 space:	.asciiz	" "
+seek:   .asciiz "peach"
+	.space  30      # to store string that is sought
+prompt: .asciiz "What to search for? "
 
 #
 #/*# End of file recur3.a		*/
