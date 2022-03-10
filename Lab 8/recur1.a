@@ -65,11 +65,18 @@ __start:		# execution starts here
 # 	a1 - level to use in path
 #------------------------------------------------
 store_path:
+	li $v0,4
+        syscall         # print name of node
+	la $a0,endl
+        li $v0,4
+        syscall         # print newline
+	
 	sll $t0,$a1,2	# each pointer is 4 bytes
 	sw $a0,path($t0)# save pointer to the name
 	addi $t0,$t0,4	# make the next entry 
 	sw $0,path($t0)	#  equal to 0.
-	jr $ra
+        jr $ra
+
 
 
 #------------------------------------------------
@@ -100,44 +107,29 @@ done:   la $a0,endl
 # mipsmark. Put your answer between dashed lines.
 #-------------- start cut -----------------------
 
-#  Student:			Account: 			*/
-
 search:
-	move $s7, $ra
-	li $s6, 0
-	li $s0, 1
-loop:
-	move $t7, $a0
-	lw $t0, 12($t7)
-	lw $t1, 4($t7)
-	lw $t2, 8($t7)
-	beq $t0, $s0, found
-	add $s6, $s6, 1
-	bgt $t1, $zero, left
-	bgt $t2, $zero, right
-
-found:
-	move $ra, $s7
+	bnez	$a0, exists
 	jr $ra
+exists:								
+	sub	$sp, $sp, 4
+	sw	$ra, ($sp)	#save registers
+	sub	$sp, $sp, 4	#will use $s0 for pointer to our tree
+	sw	$s0, ($sp)	#since it must be remembered across function calls
+	move	$s0, $a0	# s0 points to current node
 
-left:
+	lw	$a0, ($s0)	# tree -> name
+	jal	store_path
+	lw	$a0, 4($s0)	# tree-> left
+	jal	search
+	lw	$a0, 8($s0)	# tree-> right
+	jal	search
+	
 
-	move $s1, $t1
-	la $a0, ($t1)
-
-	jal store_path
-
-	la $a0, ($s1)
-	jal loop
-
-right:
-
-	move $s2, $t2
-	la $a0, ($t2)	
-	jal store_path
-
-	la $a0, ($s2)
-	jal loop
+	lw	$s0, ($sp)	#restore registers
+	add	$sp, $sp, 4
+	lw	$ra, ($sp)
+	add	$sp, $sp, 4
+	jr	$ra
 
 #--------------  end cut  -----------------------
 # Any changes below this line will be discarded by
