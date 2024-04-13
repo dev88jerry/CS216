@@ -107,9 +107,9 @@ skip:				# back here on space or unrecognized char
 	j 	parseexit
 
 operator:			# build operate node
-	add $a0, $a0, 1		# move on to next character
+	add 	$a0, $a0, 1	# move on to next character
 	move	$s2, $a1	# set up node at currently avail. space
-	add	$a1, 12		# this node requires 3 words
+	add 	$a1, $a1, 12	# this node requires 3 words
 	sw	$t0, ($s2)	# 0 = operator character
 				# $a0 pass address of rest of string
 				# $a1 is available space (see above)
@@ -170,7 +170,7 @@ finishednumber:
 
 ##---------------------------------------------------------------------------
 isDigit:                        #is the arg. a numeric char?
-        slt     $t0, $a0,'0' 
+        slti    $t0, $a0,'0'
         sgt     $t1, $a0, '9'
         nor	$v0, $t0,$t1    # true if neither too small NOR too big
 	and	$v0, 1 		# only want 1 bit result
