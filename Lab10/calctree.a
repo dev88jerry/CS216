@@ -78,7 +78,7 @@ parse:		# parse prefix expression, in string $a0, it keeps advancing
 		# nodes will be word with Operation char and 
 		#    2 pointers (3 words), or 0 and a number (2 words)
 # save registers:
-        sub     $sp,12          #save registers
+        sub $sp, $sp, 12          #save registers
         sw      $ra,  ($sp)     # return address
         sw      $s0, 4($sp)     #use s0 to point to chars
         sw      $s2, 8($sp)     #    s2 pointer to current node
@@ -101,13 +101,13 @@ skip:				# back here on space or unrecognized char
 	jal 	parsenumber
 
 	move	$s2, $a1	# set up node at currently avail. space
-	add	$a1, 8		# this node requires 2 words
+	add 	$a1, $a1, 8		# this node requires 2 words
 	sw	$0, ($s2)	# 0 = leaf node
 	sw	$v0, 4($s2)	# next word holds value
 	j 	parseexit
 
 operator:			# build operate node
-	add	$a0,1		# move on to next character
+	add $a0, $a0, 1		# move on to next character
 	move	$s2, $a1	# set up node at currently avail. space
 	add	$a1, 12		# this node requires 3 words
 	sw	$t0, ($s2)	# 0 = operator character
@@ -121,7 +121,7 @@ operator:			# build operate node
 	
 ignore:
 	beqz	$t0,endofstring #ERROR, unanticipated end of string
-	add	$a0,1		# move on to next character
+	add 	$a0, $a0, 1		# move on to next character
 	j	skip
 
 
@@ -137,13 +137,13 @@ parseexit:
         lw      $ra,  ($sp)
         lw      $s0, 4($sp)
         lw      $s2, 8($sp)
-        add     $sp, 12          # POP return address
+        add 	$sp, $sp, 12          # POP return address
         jr      $ra
 
 ##---------------------------------------------------------------------------
 parsenumber:			#Called when $a0 points to initial digit
 # save registers:
-        sub     $sp,12          #save registers
+        sub 	$sp, $sp, 12          #save registers
         sw      $ra,  ($sp)     # return address
         sw      $s0, 4($sp)     #use s0 to point to chars
         sw      $s1, 8($sp)     #    s1 for binary number being built
@@ -151,7 +151,7 @@ parsenumber:			#Called when $a0 points to initial digit
 	lb	$t0,($s0)	# we know this is a digit
 	and	$s1,$t0,0xf	# number = it's binary value
 digitloop:
-	add	$s0,1		# move on to next character
+	add 	$s0, $s0, 1		# move on to next character
 	lb	$a0,($s0)
 	jal	isDigit		# is it also a number?
 	beqz	$v0, finishednumber #no, done and don't consume char
@@ -165,7 +165,7 @@ finishednumber:
         lw      $ra,  ($sp)
         lw      $s0, 4($sp)
         lw      $s1, 8($sp)
-        add     $sp, 12          # POP return address
+        add 	$sp, $sp, 12          # POP return address
         jr      $ra
 
 ##---------------------------------------------------------------------------
@@ -190,59 +190,59 @@ evaluate:
 	move $s7, $ra		# save return address
 	li $t1,0
 
-	beqz $a0, loop		
+	beqz 	$a0, loop		
 	sub	$sp,$sp,4		# setup stack to take new node
 	sw	$v0,($sp)		#
 	lw	$s3, ($sp)		# 
 	add	$sp,$sp, 4		# 
-	lw $s3, ($sp)       # 
-	add $sp,$sp, 4
+	lw 	$s3, ($sp)       # 
+	add 	$sp,$sp, 4
 	
 loop:	
-	lb $t0, sentence($t1)	
-	abs $t0, $t0		# get value from nodes	
-	beqz $t0,strEnd	
-	add $t1,$t1,1
-	add $t2, $t2, $t0	
+	lb 	$t0, sentence($t1)	
+	abs 	$t0, $t0		# get value from nodes	
+	beqz 	$t0,strEnd	
+	add 	$t1,$t1,1
+	add 	$t2, $t2, $t0	
 	j loop
 
 strEnd:
-	li $t3, 265	
-	beq $s0, $t3, checkOP
-	li $t4, 259
-	beq $s0, $t4, checkOP	
-	li $t5, 821
-	beq $s0, $t5, checkOP
-	li $t6, 270
+	li 	$t3, 265	
+	beq 	$s0, $t3, checkOP
+	li 	$t4, 259
+	beq 	$s0, $t4, checkOP	
+	li 	$t5, 821
+	beq 	$s0, $t5, checkOP
+	li 	$t6, 270
 	
 checkOP:		
-	beq $t2, $t3, evalAdd	#check which operation
-	beq $t2, $t4, evalSub
-	beq $t2, $t5, evalMul
-	beq $t2, $t6, evalDiv
+	beq 	$t2, $t3, evalAdd	#check which operation
+	beq 	$t2, $t4, evalSub
+	beq 	$t2, $t5, evalMul
+	beq 	$t2, $t6, evalDiv
 
 evalAdd:
-	add $t2, $t2, $t3	# addition
-	li $t0, 12345
+	add 	$t2, $t2, $t3	# addition
+	li 	$t0, 12345
 	j ret
 	
 evalSub:
-	sub $t2, $t2, $t4	# subtraction
-	li $t0, 35
+	sub 	$t2, $t2, $t4	# subtraction
+	li 	$t0, 35
 	j ret
 
 evalMul:
-	mul $t2, $t2, $t5	# multiplication
-	li $t0, 230
+	mul 	$t2, $t2, $t5	# multiplication
+	li 	$t0, 230
 	j ret
 
 evalDiv:
-	beqz $t6, divErr	# division
-	div $t2, $t2, $t6
-	beqz $t2, ret
+	beqz 	$t6, divErr	# division
+	div 	$t2, $t2, $t6
+	beqz 	$t2, ret
 
 divErr:	
-	li $v0, -99999		# div error
+	li 	$v0, -99999		# div error
 	la	$a0, DivError	# write stack empty message
 	li	$v0,4
 	syscall
@@ -250,8 +250,8 @@ divErr:
 	syscall			# and exit program
 	
 ret:
-	move $v0, $t0		# return back to top
-	move $ra, $s7	
+	move 	$v0, $t0		# return back to top
+	move 	$ra, $s7	
 	jr $ra
 	
 
